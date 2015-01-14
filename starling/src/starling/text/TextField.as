@@ -35,6 +35,7 @@ package starling.text
     import starling.utils.RectangleUtil;
     import starling.utils.VAlign;
     import starling.utils.deg2rad;
+    import starling.utils.formatString;
 
     /** A TextField displays text, either using standard true type fonts or custom bitmap fonts.
      *  
@@ -232,6 +233,11 @@ package starling.text
          */
         protected function formatText(textField:flash.text.TextField, textFormat:TextFormat):void {}
 
+        private static function replaceHtmlFontSize(matchedString:String, capturedMatch1:String, ...rest):String {
+            var newSize:Number = parseFloat(capturedMatch1) * Starling.contentScaleFactor;
+            return formatString("size='{0}'", newSize.toString());
+        }
+
         private function renderText(scale:Number, resultTextBounds:Rectangle):BitmapData
         {
             var width:Number  = mHitArea.width  * scale;
@@ -262,9 +268,9 @@ package starling.text
             sNativeTextField.multiline = true;            
             sNativeTextField.wordWrap = true;         
 
-            if (mIsHtmlText) sNativeTextField.htmlText = mText;
+            if (mIsHtmlText) sNativeTextField.htmlText = mText.replace(/size='([\d,]+)'/g, replaceHtmlFontSize);
             else             sNativeTextField.text     = mText;
-               
+
             sNativeTextField.embedFonts = true;
             sNativeTextField.filters = mNativeFilters;
             
