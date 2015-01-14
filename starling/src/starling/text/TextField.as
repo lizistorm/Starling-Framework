@@ -293,10 +293,13 @@ package starling.text
             var textWidth:Number  = sNativeTextField.textWidth;
             var textHeight:Number = sNativeTextField.textHeight;
 
+            // if 'nativeFilters' are in use, the text field might grow beyond its bounds
+            var filterOffset:Point = calculateFilterOffset(sNativeTextField, hAlign, vAlign);
+
             if (isHorizontalAutoSize)
-                sNativeTextField.width = width = Math.ceil(textWidth + 5);
+                sNativeTextField.width = width = Math.ceil(textWidth + 5 + filterOffset.x);
             if (isVerticalAutoSize)
-                sNativeTextField.height = height = Math.ceil(textHeight + 4);
+                sNativeTextField.height = height = Math.ceil(textHeight + 4 + filterOffset.y);
             
             // avoid invalid texture size
             if (width  < 1) width  = 1.0;
@@ -311,9 +314,6 @@ package starling.text
             if (vAlign == VAlign.TOP)         textOffsetY = 2; // flash adds a 2 pixel offset
             else if (vAlign == VAlign.CENTER) textOffsetY = (height - textHeight) / 2.0;
             else if (vAlign == VAlign.BOTTOM) textOffsetY =  height - textHeight - 2;
-            
-            // if 'nativeFilters' are in use, the text field might grow beyond its bounds
-            var filterOffset:Point = calculateFilterOffset(sNativeTextField, hAlign, vAlign);
             
             // finally: draw text field to bitmap data
             var bitmapData:BitmapData = new BitmapData(width, height, true, 0x0);
@@ -355,7 +355,7 @@ package starling.text
                 format.size = size--;
                 textField.defaultTextFormat = format;
 
-                if (mIsHtmlText) textField.htmlText = mText;
+                if (mIsHtmlText) textField.htmlText = mText.replace(/size='([\d,]+)'/g, replaceHtmlFontSize);
                 else             textField.text     = mText;
             }
         }
